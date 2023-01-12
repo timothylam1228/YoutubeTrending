@@ -1,9 +1,12 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 import numpy as np
 import json
 import urllib.request
 from data import Data
 import pathlib
+import math
+import uuid
+import textwrap
 
 # path to temp folder
 
@@ -12,30 +15,105 @@ THUMBNAIL_TEMP_PATH = "./temp"
 
 
 class Processor:
-    def __init__(self, data):
+    def __init__(self, data, number):
         self.data = data
         self.backgroundImage = "assets/background.png"
-        self.font = ImageFont.truetype(
-            "assets/SofiaSans-VariableFont_wght.ttf", size=20
+        self.rank_font = ImageFont.truetype(
+            "assets/Roboto-Bold.ttf",
+            size=25,
         )
+        self.font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
+        self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=20)
         self.image = Image.open(self.backgroundImage)
         self.drawImage = ImageDraw.Draw(self.image)
         self.thumbnail = None
+        self.thumbnail_size = None
+        self.number = number
+        self.width, self.height = 512, 512
 
     def generate_image(self):
-        img = Image.open(self.backgroundImage)
-        I1 = ImageDraw.Draw(img)
-        I1.text((28, 36), "Daily Trending YouTube Video", fill=(255, 0, 0))
-        I1.text((28, 50), self.data.get_video_data(0)["title"], "blue", font=self.font)
-        img.save("car2.png")
+        self.add_header()
+        self.add_thumbnail()
+        self.add_like()
+        self.add_view_count()
+        self.add_channel_title()
+        self.image.save(
+            ("result/{number} - {i}.png").format(number=self.number, i=uuid.uuid4())
+        )
 
     def add_header(self):
-        self.drawImage.text((28, 36), "Daily Trending YouTube Video", fill=(255, 0, 0))
+        self.data["title"] = "Top" + str(self.number) + ". " + self.data["title"]
+        new_header = textwrap.wrap(self.data["title"], width=50)
+        line_heigh = 0
+        self.drawImage.text(
+            (50, 60),
+            ("#" + str(self.number)),
+            fill=(230, 210, 225),
+            font=self.rank_font,
+            align="center",
+        )
+        for i in new_header:
+
+            self.drawImage.text(
+                (80, 120 + (line_heigh * 20)),
+                (i),
+                fill=(0, 0, 0),
+                font=self.font,
+                align="center",
+            )
+            line_heigh = line_heigh + 1
         self.image.save("result/temp.png")
 
     def add_thumbnail(self):
         self.thumbnail = self.data["thumbnail"]
-        resource = urllib.request.urlretrieve(self.thumbnail, "temp/test.png")
+        urllib.request.urlretrieve(self.thumbnail, "temp/test.png")
         thumbnail = Image.open("temp/test.png")
-        self.image.paste(thumbnail, (20, 20))
-        self.image.save("car2.png")
+        thumbnail_width, thumbnail_height = thumbnail.size
+        # Resize image and keep aspect ration
+        thumbnail = thumbnail.resize(
+            (math.floor(thumbnail_width * 1), math.floor(thumbnail_height * 1)),
+            Image.ANTIALIAS,
+        )
+        thumbnail = ImageOps.expand(thumbnail, border=2, fill=(230, 210, 225))
+
+        self.thumbnail_size = thumbnail.size
+        self.image.paste(
+            thumbnail,
+            (
+                int((512 - self.thumbnail_size[0]) / 2),
+                int(512 / 1.4 - self.thumbnail_size[1]),
+            ),
+        )
+        pathlib.Path("temp/test.png").unlink()
+
+    def add_like(self):
+        self.drawImage.text(
+            (300, 380),
+            ("Likes: " + self.decminal_to_string(self.data["likeCount"])),
+            "blue",
+            font=self.font,
+            align="center",
+        )
+
+    def add_view_count(self):
+        self.drawImage.text(
+            (300, 420),
+            ("Views: " + self.decminal_to_string(self.data["viewCount"])),
+            "blue",
+            font=self.font,
+            align="center",
+        )
+
+    def add_channel_title(self):
+        self.drawImage.text(
+            (
+                int((512 - self.thumbnail_size[0]) / 2),
+                int(512 - self.thumbnail_size[1] / 1.5),
+            ),
+            self.data["channelTitle"],
+            (180, 115, 180),
+            font=self.channel_font,
+        )
+
+    def decminal_to_string(self, number):
+        return "{:,}".format(int(number))
