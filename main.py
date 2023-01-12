@@ -3,6 +3,8 @@ import numpy as np
 import json
 import urllib.request
 from data import Data
+from processor import Processor
+
 # img = Image.open('background.png')
 
 
@@ -23,22 +25,26 @@ from data import Data
 
 # # Display edited image
 # # img.show()
- 
+
 # # Save the edited image
 # img.save("car2.png")
 
+
 def get_thumbnail_to_temp_folder(number):
-    f = open('data.json',encoding="utf-8")
+    f = open("data.json", encoding="utf-8")
     data = json.load(f)
     # for i in data:
-    thumbnail = data[0]['snippet']['thumbnails']['default']['url']
-    resource = urllib.request.urlretrieve(thumbnail,("test{i}.png").format(0))
+    thumbnail = data[0]["snippet"]["thumbnails"]["default"]["url"]
+    resource = urllib.request.urlretrieve(thumbnail, ("test{i}.png").format(0))
+
 
 def main():
-    f = open('data.json',encoding="utf-8")
+    f = open("data.json", encoding="utf-8")
     json_data = json.load(f)
     data = Data(json_data)
-    print(data.get_video_data(0))
+    final_result = Processor(data.get_video_data(0))
+    final_result.add_header()
+    final_result.add_thumbnail()
 
 
 main()
