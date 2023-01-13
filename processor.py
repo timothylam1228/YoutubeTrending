@@ -53,7 +53,6 @@ class Processor:
             align="center",
         )
         for i in new_header:
-
             self.drawImage.text(
                 (80, 120 + (line_heigh * 20)),
                 (i),
@@ -62,7 +61,6 @@ class Processor:
                 align="center",
             )
             line_heigh = line_heigh + 1
-        self.image.save("result/temp.png")
 
     def add_thumbnail(self):
         self.thumbnail = self.data["thumbnail"]
@@ -88,19 +86,19 @@ class Processor:
 
     def add_like(self):
         self.drawImage.text(
-            (300, 380),
+            (280, 380),
             ("Likes: " + self.decminal_to_string(self.data["likeCount"])),
-            "blue",
-            font=self.font,
+            (180, 115, 180),
+            font=self.channel_font,
             align="center",
         )
 
     def add_view_count(self):
         self.drawImage.text(
-            (300, 420),
+            (280, 420),
             ("Views: " + self.decminal_to_string(self.data["viewCount"])),
-            "blue",
-            font=self.font,
+            (180, 115, 180),
+            font=self.channel_font,
             align="center",
         )
 
