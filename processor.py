@@ -23,7 +23,7 @@ class Processor:
             size=25,
         )
         self.font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
-        self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=20)
+        self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=18)
         self.image = Image.open(self.backgroundImage)
         self.drawImage = ImageDraw.Draw(self.image)
         self.thumbnail = None
@@ -42,8 +42,16 @@ class Processor:
         )
 
     def add_header(self):
+        title_start_position = 115
         self.data["title"] = "Top" + str(self.number) + ". " + self.data["title"]
-        new_header = textwrap.wrap(self.data["title"], width=50)
+        new_header = textwrap.wrap(self.data["title"], width=45)
+        if len(new_header) >= 3:
+            new_header = new_header[:2]
+            new_header[1] = new_header[1] + "..."
+
+        if len(new_header) == 1:
+            title_start_position = 125
+
         line_heigh = 0
         self.drawImage.text(
             (50, 60),
@@ -54,7 +62,7 @@ class Processor:
         )
         for i in new_header:
             self.drawImage.text(
-                (80, 120 + (line_heigh * 20)),
+                (85, title_start_position + (line_heigh * 20)),
                 (i),
                 fill=(0, 0, 0),
                 font=self.font,
@@ -103,15 +111,22 @@ class Processor:
         )
 
     def add_channel_title(self):
-        self.drawImage.text(
-            (
-                int((512 - self.thumbnail_size[0]) / 2),
-                int(512 - self.thumbnail_size[1] / 1.5),
-            ),
-            self.data["channelTitle"],
-            (180, 115, 180),
-            font=self.channel_font,
-        )
+        # CHECK TEXT WIDTH
+        new_title = textwrap.wrap(self.data["channelTitle"], width=15)
+        if len(new_title) >= 2:
+            self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
+        line_height = 0
+        for i in new_title:
+            self.drawImage.text(
+                (
+                    int((512 - self.thumbnail_size[0]) / 2),
+                    int(512 - self.thumbnail_size[1] / 1.5 + line_height * 20),
+                ),
+                i,
+                (180, 115, 180),
+                font=self.channel_font,
+            )
+            line_height = line_height + 1
 
     def decminal_to_string(self, number):
         return "{:,}".format(int(number))
