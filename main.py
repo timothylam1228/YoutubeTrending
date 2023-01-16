@@ -5,7 +5,7 @@ import urllib.request
 from data import Data
 from processor import Processor
 
-SAVE_FOLDER = 'result'
+SAVE_FOLDER = "result"
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     f = open("data.json", encoding="utf-8")
     json_data = json.load(f)
     data = Data(json_data)
-    for i in range(0, 9):
+    for i in range(0, 1):
         final_result = Processor(data.get_video_data(i), i + 1)
         final_result.generate_image()
 

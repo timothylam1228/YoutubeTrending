@@ -13,7 +13,7 @@ import textwrap
 
 THUMBNAIL_TEMP_PATH = "./temp"
 BACKGROUND_IMAGE = "assets/background2.png"
-IMAGE_SIZE = 512, 512
+IMAGE_SIZE = 1080, 1080
 
 
 class Processor:
@@ -22,11 +22,10 @@ class Processor:
         self.backgroundImage = BACKGROUND_IMAGE
         self.rank_font = ImageFont.truetype(
             "assets/Roboto-Bold.ttf",
-            size=25,
+            size=50,
         )
-        self.font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
-        self.channel_font = ImageFont.truetype(
-            "assets/Roboto-Bold.ttf", size=18)
+        self.font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=30)
+        self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=36)
         self.image = Image.open(self.backgroundImage)
         self.drawImage = ImageDraw.Draw(self.image)
         self.thumbnail = None
@@ -45,20 +44,19 @@ class Processor:
         )
 
     def add_header(self):
-        title_start_position = 115
-        self.data["title"] = "Top" + \
-            str(self.number) + ". " + self.data["title"]
-        new_header = textwrap.wrap(self.data["title"], width=45)
+        title_start_position = 250
+        self.data["title"] = "Top" + str(self.number) + ". " + self.data["title"]
+        new_header = textwrap.wrap(self.data["title"], width=50)
         if len(new_header) >= 3:
             new_header = new_header[:2]
             new_header[1] = new_header[1] + "..."
 
         if len(new_header) == 1:
-            title_start_position = 125
+            title_start_position = 300
 
         line_heigh = 0
         self.drawImage.text(
-            (50, 60),
+            (100, 120),
             ("#" + str(self.number)),
             fill=(230, 210, 225),
             font=self.rank_font,
@@ -66,7 +64,7 @@ class Processor:
         )
         for i in new_header:
             self.drawImage.text(
-                (85, title_start_position + (line_heigh * 20)),
+                (170, title_start_position + (line_heigh * 40)),
                 (i),
                 fill=(0, 0, 0),
                 font=self.font,
@@ -81,7 +79,7 @@ class Processor:
         thumbnail_width, thumbnail_height = thumbnail.size
         # Resize image and keep aspect ration
         thumbnail = thumbnail.resize(
-            (math.floor(thumbnail_width * 1), math.floor(thumbnail_height * 1)),
+            (math.floor(thumbnail_width * 2.2), math.floor(thumbnail_height * 2.2)),
             Image.ANTIALIAS,
         )
         thumbnail = ImageOps.expand(thumbnail, border=2, fill=(230, 210, 225))
@@ -98,7 +96,7 @@ class Processor:
 
     def add_like(self):
         self.drawImage.text(
-            (280, 380),
+            (560, 820),
             ("Likes: " + self.decminal_to_string(self.data["likeCount"])),
             (180, 115, 180),
             font=self.channel_font,
@@ -107,7 +105,7 @@ class Processor:
 
     def add_view_count(self):
         self.drawImage.text(
-            (280, 420),
+            (560, 900),
             ("Views: " + self.decminal_to_string(self.data["viewCount"])),
             (180, 115, 180),
             font=self.channel_font,
@@ -116,17 +114,17 @@ class Processor:
 
     def add_channel_title(self):
         # CHECK TEXT WIDTH
-        new_title = textwrap.wrap(self.data["channelTitle"], width=15)
+        new_title = textwrap.wrap(self.data["channelTitle"], width=30)
         if len(new_title) >= 2:
-            self.channel_font = ImageFont.truetype(
-                "assets/Roboto-Bold.ttf", size=15)
+            self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=30)
         line_height = 0
         for i in new_title:
             self.drawImage.text(
                 (
                     int((IMAGE_SIZE[0] - self.thumbnail_size[0]) / 2),
-                    int(IMAGE_SIZE[1] - self.thumbnail_size[1] /
-                        1.5 + line_height * 20),
+                    int(
+                        IMAGE_SIZE[1] - self.thumbnail_size[1] / 1.7 + line_height * 40
+                    ),
                 ),
                 i,
                 (180, 115, 180),
