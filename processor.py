@@ -12,24 +12,27 @@ import textwrap
 
 
 THUMBNAIL_TEMP_PATH = "./temp"
+BACKGROUND_IMAGE = "assets/background2.png"
+IMAGE_SIZE = 512, 512
 
 
 class Processor:
     def __init__(self, data, number):
         self.data = data
-        self.backgroundImage = "assets/background.png"
+        self.backgroundImage = BACKGROUND_IMAGE
         self.rank_font = ImageFont.truetype(
             "assets/Roboto-Bold.ttf",
             size=25,
         )
         self.font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
-        self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=18)
+        self.channel_font = ImageFont.truetype(
+            "assets/Roboto-Bold.ttf", size=18)
         self.image = Image.open(self.backgroundImage)
         self.drawImage = ImageDraw.Draw(self.image)
         self.thumbnail = None
         self.thumbnail_size = None
         self.number = number
-        self.width, self.height = 512, 512
+        self.width, self.height = IMAGE_SIZE
 
     def generate_image(self):
         self.add_header()
@@ -43,7 +46,8 @@ class Processor:
 
     def add_header(self):
         title_start_position = 115
-        self.data["title"] = "Top" + str(self.number) + ". " + self.data["title"]
+        self.data["title"] = "Top" + \
+            str(self.number) + ". " + self.data["title"]
         new_header = textwrap.wrap(self.data["title"], width=45)
         if len(new_header) >= 3:
             new_header = new_header[:2]
@@ -86,8 +90,8 @@ class Processor:
         self.image.paste(
             thumbnail,
             (
-                int((512 - self.thumbnail_size[0]) / 2),
-                int(512 / 1.4 - self.thumbnail_size[1]),
+                int((IMAGE_SIZE[0] - self.thumbnail_size[0]) / 2),
+                int(IMAGE_SIZE[1] / 1.4 - self.thumbnail_size[1]),
             ),
         )
         pathlib.Path("temp/test.png").unlink()
@@ -114,13 +118,15 @@ class Processor:
         # CHECK TEXT WIDTH
         new_title = textwrap.wrap(self.data["channelTitle"], width=15)
         if len(new_title) >= 2:
-            self.channel_font = ImageFont.truetype("assets/Roboto-Bold.ttf", size=15)
+            self.channel_font = ImageFont.truetype(
+                "assets/Roboto-Bold.ttf", size=15)
         line_height = 0
         for i in new_title:
             self.drawImage.text(
                 (
-                    int((512 - self.thumbnail_size[0]) / 2),
-                    int(512 - self.thumbnail_size[1] / 1.5 + line_height * 20),
+                    int((IMAGE_SIZE[0] - self.thumbnail_size[0]) / 2),
+                    int(IMAGE_SIZE[1] - self.thumbnail_size[1] /
+                        1.5 + line_height * 20),
                 ),
                 i,
                 (180, 115, 180),
